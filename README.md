@@ -4,12 +4,18 @@
 
 AWSで以下のインスタンスを立てて、Webサーバの構築とWebアプリケーションのデプロイを実施する。
 
+- タグ
+    - 自分の番号_ubuntu_web
 - AMI
     - Ubuntu Server 22.04 LTS
+- インスタンスタイプ
+    - t2.micro
 - セキュリティグループ
     - SSH（22）
     - HTTP（80）
-    - カスタムTCP（8080）
+    - カスタムTCP（8080）　※Tomcat確認用
+- ストレージ
+    - 8GiB
 
 <br><br>
 
