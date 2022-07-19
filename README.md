@@ -209,6 +209,12 @@ Apache HTTP Server（以下、Apache）をインストールする。
 $ sudo apt install -y apache2
 ```
 
+サーバ起動時のサービス自動起動を有効にする。
+
+```
+sudo systemctl enable apache2
+```
+
 Apacheの起動状況を確認する。
 
 ```
