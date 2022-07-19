@@ -1,5 +1,18 @@
 # Linux(Ubuntu)によるWebサーバ構築
 
+### 0. 前提条件
+
+AWSで以下のインスタンスを立てて、Webサーバの構築とWebアプリケーションのデプロイを実施する。
+
+- AMI
+    - Ubuntu Server 22.04 LTS
+- セキュリティグループ
+    - SSH（22）
+    - HTTP（80）
+    - カスタムTCP（8080）
+
+<br><br>
+
 ### 1. OpenJDK11(JRE)
 
 #### 1.1. JREのインストール
@@ -29,7 +42,7 @@ OpenJDK 64-Bit Server VM (build 11.0.15+10-Ubuntu-0ubuntu0.22.04.1, mixed mode, 
 
 #### 1.2. 環境変数の設定
 
-ホームディレクトリ（~）にあるbashの設定ファイル（.bashrc）を開き、PATHを設定する。
+viコマンドでホームディレクトリ（~）にあるbashの設定ファイル（.bashrc）を開き、PATHを設定する。
 
 ```bash
 # ~/.bashrc
@@ -52,7 +65,84 @@ $ echo $JAVA_HOME
 
 <br><br>
 
-### 2. Apache Tomcat
+### 2. MySQL
+
+#### 2.1. MySQL8.0のインストール
+
+MySQL8.0をインストールする。
+
+```
+$ sudo apt install -y mysql-server
+```
+
+バージョンを確認する。
+
+```
+$ mysql --version
+mysql  Ver 8.0.29-0ubuntu0.22.04.2 for Linux on x86_64 ((Ubuntu))
+```
+
+MySQLの起動状況を確認する。（緑丸でactiveになっていればOK）
+
+```
+$ systemctl status mysql
+● mysql.service - MySQL Community Server
+     Loaded: loaded (/lib/systemd/system/mysql.service; enabled; vendor preset: enabled)
+     Active: active (running) since Tue 2022-07-19 09:29:42 UTC; 1min 44s ago
+  (中略)
+```
+
+<br>
+
+#### 2.2. rootユーザの設定
+
+MySQLに接続する。
+
+```
+$ sudo mysql -uroot
+```
+
+ALTERコマンドでパスワードを設定する。
+
+```sql
+mysql> ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password by 'P@ssw0rd';
+Query OK, 0 rows affected (0.01 sec)
+```
+
+接続確認をするため、一度MySQLを抜ける。
+
+```sql
+mysql> exit
+```
+
+設定したパスワードでMySQLに接続できるか確認する。
+
+```sql
+$ mysql -u root -p
+Enter password:
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 12
+Server version: 8.0.29-0ubuntu0.22.04.2 (Ubuntu)
+
+Copyright (c) 2000, 2022, Oracle and/or its affiliates.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql>
+```
+
+<br>
+
+必要なデータベース、テーブル、データを作成する。
+
+
+<br><br>
+
+### 3. Apache Tomcat
 
 Apache Tomcat（以下、Tomcat）をインストールする。
 
@@ -69,7 +159,7 @@ sudo systemctl enable tomcat9
 Tomcatの起動状況を確認する。（緑丸でactiveになっていればOK）
 
 ```
-$ sudo systemctl status tomcat9
+$ systemctl status tomcat9
 ● tomcat9.service - Apache Tomcat 9 Web Application Server
      Loaded: loaded (/lib/systemd/system/tomcat9.service; enabled; vendor preset: enabled)
      Active: active (running) since Thu 2022-07-14 09:26:27 UTC; 6min ago
@@ -84,9 +174,13 @@ $ sudo systemctl status tomcat9
 
 <br><br>
 
-### 3. Webアプリケーションのデプロイ
+### 4. Webアプリケーションのデプロイ
 
-ローカルPCでWARファイルを生成し、Linuxのホームディレクトリ(~)にファイルをコピーする。
+ローカルPCでWARファイルを生成し、Linuxのホームディレクトリにファイルをコピーする。
+
+> Tera TermのSSH SCP機能でローカルPCからサーバにファイルをコピーできる。
+
+<br>
 
 次のコマンドでWARファイルをTomcatのwebappsディレクトリに移動する。
 ```
@@ -107,7 +201,7 @@ ROOT  shop_manage  shop_manage.war
 
 <br><br>
 
-### 4. Apache HTTP Server
+### 5. Apache HTTP Server
 
 Apache HTTP Server（以下、Apache）をインストールする。
 
@@ -127,7 +221,7 @@ $ systemctl status apache2
 
 <br><br>
 
-### 5. Apache HTTP ServerとTomcatの連携
+### 6. Apache HTTP ServerとTomcatの連携
 
 viコマンドで`/var/lib/tomcat9/conf/server.xml`を開き、Tomcatの無効化とAJPの有効化するよう修正する。
 ```xml
