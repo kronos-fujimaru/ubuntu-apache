@@ -235,7 +235,7 @@ $ systemctl status apache2
 
 ### 6. Apache HTTP ServerとTomcatの連携
 
-viコマンドで`/var/lib/tomcat9/conf/server.xml`を開き、Tomcatの無効化とAJPの有効化するよう修正する。
+viコマンドで`/var/lib/tomcat9/conf/server.xml`を開き、Tomcatの無効化（コメントアウト）とAJPの有効化（アンコメント）するよう修正する。
 ```xml
 <!--
 <Connector port="8080" protocol="HTTP/1.1"
