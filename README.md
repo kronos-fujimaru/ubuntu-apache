@@ -10,6 +10,10 @@ AWSで以下のインスタンスを立てて、Webサーバの構築とWebア�
     - Ubuntu Server 22.04 LTS
 - インスタンスタイプ
     - t2.micro
+- VPC
+    - デフォルトのVPC
+- サブネット
+    - ap-northeast-1a
 - セキュリティグループ
     - SSH（22）
     - HTTP（80）
